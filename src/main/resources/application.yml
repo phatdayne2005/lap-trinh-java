@@ -68,6 +68,16 @@ spring:
 server:
   port: 8080
 
+  # NFR-S05: không để lộ stack trace, câu truy vấn SQL hay thông tin cấu hình
+  # trong phản hồi lỗi. Trước khi khai tường minh, phản hồi 500 trả về nguyên
+  # "trace" gồm tên package vn.uth.careercompass, tên lớp, tên method, số dòng,
+  # và cả câu INSERT khi vi phạm ràng buộc khoá duy nhất.
+  error:
+    include-stacktrace: never
+    include-message: never
+    include-binding-errors: never
+    include-exception: false
+
 # ====== LOG ======
 logging:
   level:

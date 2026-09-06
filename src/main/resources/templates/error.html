@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<!--
+  Trang lỗi chung. Spring Boot tự dùng view tên "error" cho mọi mã lỗi HTTP.
+
+  CỐ Ý KHÔNG kế thừa layout/base.html: fragment head của layout đọc ${_csrf.token},
+  mà khi lỗi xảy ra với khách chưa đăng nhập thì biến đó có thể không tồn tại —
+  template sẽ ném tiếp một lỗi nữa ngay trong lúc đang hiển thị lỗi.
+
+  Chỉ hiện mã trạng thái và một câu tiếng Việt. KHÔNG hiện ${message}, ${trace} hay
+  ${exception}: những biến đó chứa tên lớp, số dòng và cả câu SQL (NFR-S05).
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerCompass · Đã xảy ra lỗi</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(ellipse at top, #16213e 0%, #0b1020 55%, #070a14 100%);
+            color: #e6ecff;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 24px;
+        }
+        .khung {
+            width: 100%; max-width: 520px; text-align: center;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(122, 162, 255, .22);
+            border-radius: 18px;
+            padding: 44px 34px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, .45);
+        }
+        .ma {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 60px; font-weight: 700; line-height: 1;
+            background: linear-gradient(135deg, #7aa2ff, #b98cff);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h1 { font-size: 20px; font-weight: 600; margin: 18px 0 10px; }
+        p { margin: 0 0 26px; color: #9fb0d9; font-size: 14px; line-height: 1.65; }
+        .nut {
+            display: inline-block; padding: 11px 26px; border-radius: 10px;
+            background: linear-gradient(135deg, #4f7dff, #7a5cff);
+            color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;
+        }
+        .nut:hover { filter: brightness(1.12); }
+        .duong-dan {
+            margin-top: 22px; font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; color: #5f6f96; word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+<div class="khung">
+    <div class="ma" th:text="${status} ?: 'Lỗi'">500</div>
+
+    <h1 th:switch="${status}">
+        <span th:case="403">Bạn không có quyền truy cập</span>
+        <span th:case="404">Không tìm thấy trang</span>
+        <span th:case="409">Dữ liệu bị trùng</span>
+        <span th:case="400">Yêu cầu không hợp lệ</span>
+        <span th:case="*">Đã xảy ra lỗi</span>
+    </h1>
+
+    <p th:switch="${status}">
+        <span th:case="403">Tài khoản hiện tại không được phép mở khu vực này.</span>
+        <span th:case="404">Đường dẫn không tồn tại hoặc nội dung đã bị xoá.</span>
+        <span th:case="409">Bản ghi bạn vừa tạo đã có sẵn trong hệ thống.</span>
+        <span th:case="400">Dữ liệu gửi lên không đúng định dạng hoặc thiếu thông tin.</span>
+        <span th:case="*">Hệ thống gặp sự cố khi xử lý yêu cầu. Vui lòng thử lại sau.</span>
+    </p>
+
+    <a class="nut" th:href="@{/}">Về trang chủ</a>
+
+    <div class="duong-dan" th:if="${path}" th:text="${path}"></div>
+</div>
+</body>
+</html>

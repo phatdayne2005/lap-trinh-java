@@ -19,7 +19,12 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http, CustomOidcUserService customOidcUserService) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/", "/login", "/register", "/forgot", "/reset-password", "/oauth2/**", "/css/**", "/js/**", "/p/**").permitAll()
+                    // "/error" phải công khai, nếu không mọi trang lỗi của khách chưa đăng nhập
+                    // đều bị nuốt thành redirect sang /login. Cụ thể: /p/{slug} tuy đã permitAll
+                    // nhưng khi slug không tồn tại, controller ném 404 -> Spring forward sang
+                    // /error -> rơi vào anyRequest().authenticated() -> 302 /login. Người dùng
+                    // không bao giờ thấy được trang 404 (FR5.3, NFR-S01).
+                    .requestMatchers("/", "/login", "/register", "/forgot", "/reset-password", "/oauth2/**", "/css/**", "/js/**", "/p/**", "/error").permitAll()
                     .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                     .requestMatchers("/counselor", "/counselor/**").hasRole("COUNSELOR")
                     .anyRequest().authenticated()
