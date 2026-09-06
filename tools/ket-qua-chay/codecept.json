@@ -1,0 +1,184 @@
+{
+ "stats": {
+  "suites": 8,
+  "tests": 17,
+  "passes": 14,
+  "pending": 0,
+  "failures": 3,
+  "start": "2026-09-06T13:16:23.728Z",
+  "end": "2026-09-06T13:18:10.896Z",
+  "duration": 107168
+ },
+ "tests": [
+  {
+   "ma": "TC-ADM-001",
+   "ten": "Quản trị viên xem được danh sách người dùng",
+   "tags": "@P1",
+   "feature": "Quản trị người dùng",
+   "file": "admin_test.js",
+   "giay": 3.4,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-ADM-002",
+   "ten": "Quản trị viên tìm kiếm được người dùng theo email",
+   "tags": "@P1",
+   "feature": "Quản trị người dùng",
+   "file": "admin_test.js",
+   "giay": 5.3,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-ADM-003",
+   "ten": "Quản trị viên không được tự đổi vai trò của chính mình",
+   "tags": "@P1 @known-bug",
+   "feature": "Quản trị người dùng",
+   "file": "admin_test.js",
+   "giay": 6.8,
+   "status": "FAIL",
+   "loi": "Element \"input[name=keyword]\" is not visible on page."
+  },
+  {
+   "ma": "TC-AUTH-001",
+   "ten": "Đăng ký tài khoản mới thành công",
+   "tags": "@P0 @smoke",
+   "feature": "Xác thực tài khoản",
+   "file": "auth_test.js",
+   "giay": 4.4,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-AUTH-002",
+   "ten": "Đăng ký bằng email đã tồn tại thì bị từ chối",
+   "tags": "@P0",
+   "feature": "Xác thực tài khoản",
+   "file": "auth_test.js",
+   "giay": 4.5,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-AUTH-003",
+   "ten": "Đăng nhập sai mật khẩu bị từ chối",
+   "tags": "@P0 @smoke",
+   "feature": "Xác thực tài khoản",
+   "file": "auth_test.js",
+   "giay": 5.0,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-DSB-001",
+   "ten": "Dashboard hiển thị thống kê sau khi hoàn tất onboarding",
+   "tags": "@P1",
+   "feature": "Trang tổng quan",
+   "file": "dashboard_test.js",
+   "giay": 6.4,
+   "status": "FAIL",
+   "loi": ""
+  },
+  {
+   "ma": "TC-ONB-001",
+   "ten": "Hoàn thành 3 bước onboarding rồi vào được dashboard",
+   "tags": "@P0 @smoke",
+   "feature": "Luồng khởi tạo hồ sơ (Onboarding)",
+   "file": "onboarding_test.js",
+   "giay": 5.7,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-ONB-002",
+   "ten": "Chưa onboarding thì mọi trang đều bị đưa về bước 1",
+   "tags": "@P0",
+   "feature": "Luồng khởi tạo hồ sơ (Onboarding)",
+   "file": "onboarding_test.js",
+   "giay": 4.8,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-PRF-001",
+   "ten": "Đổi mật khẩu rồi đăng nhập lại bằng mật khẩu mới",
+   "tags": "@P1",
+   "feature": "Hồ sơ cá nhân",
+   "file": "profile_test.js",
+   "giay": 10.7,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-PRF-002",
+   "ten": "Trang hồ sơ mở được và hiện đúng email đang đăng nhập",
+   "tags": "@P1",
+   "feature": "Hồ sơ cá nhân",
+   "file": "profile_test.js",
+   "giay": 6.2,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-RMP-001",
+   "ten": "Xem được lộ trình sau khi hoàn tất onboarding",
+   "tags": "@P1",
+   "feature": "Lộ trình học tập",
+   "file": "roadmap_test.js",
+   "giay": 5.7,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-RMP-002",
+   "ten": "Kỹ năng chọn ở onboarding được tính vào tiến độ lộ trình",
+   "tags": "@P1",
+   "feature": "Lộ trình học tập",
+   "file": "roadmap_test.js",
+   "giay": 7.3,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-SEC-001",
+   "ten": "Sinh viên truy cập trang quản trị thì bị chặn",
+   "tags": "@P0 @smoke",
+   "feature": "Phân quyền và bảo mật truy cập",
+   "file": "security_test.js",
+   "giay": 4.4,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-SEC-002",
+   "ten": "Khách chưa đăng nhập vào trang trong bị đưa về đăng nhập",
+   "tags": "@P0 @smoke",
+   "feature": "Phân quyền và bảo mật truy cập",
+   "file": "security_test.js",
+   "giay": 1.0,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-SKG-001",
+   "ten": "Xem được kết quả phân tích khoảng trống kỹ năng",
+   "tags": "@P1",
+   "feature": "Phân tích khoảng trống kỹ năng",
+   "file": "skillgap_test.js",
+   "giay": 5.8,
+   "status": "PASS",
+   "loi": ""
+  },
+  {
+   "ma": "TC-SKG-002",
+   "ten": "Lưu báo cáo phân tích thành công",
+   "tags": "@P1",
+   "feature": "Phân tích khoảng trống kỹ năng",
+   "file": "skillgap_test.js",
+   "giay": 16.1,
+   "status": "FAIL",
+   "loi": "element (form[action*=\"/skill-gap/reports\"] button[type=submit]) still not present on page after 10 sec locator.waitFor: Timeout 10000ms exceeded. Call log: \u001b[2m - waiti"
+  }
+ ]
+}
