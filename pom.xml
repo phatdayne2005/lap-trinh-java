@@ -45,7 +45,7 @@
 		<!-- Định danh dự án trên sonarcloud.io. projectKey do SonarCloud tự sinh
 		     theo dạng <organization>_<repo>, không được tự đặt lại. -->
 		<sonar.organization>phatdayne2005</sonar.organization>
-		<sonar.projectKey>phatdayne2005_lap-trinh-java</sonar.projectKey>
+		<sonar.projectKey>phatdayne2005_careercompass</sonar.projectKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
 		<!-- SonarQube KHÔNG tự chạy test và KHÔNG tự đo coverage. Nó chỉ đọc lại
