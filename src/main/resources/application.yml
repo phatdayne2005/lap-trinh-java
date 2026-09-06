@@ -2,6 +2,20 @@ spring:
   application:
     name: CareerCompass
 
+  devtools:
+    # BẮT BUỘC, nếu không thì khối server.error bên dưới vô tác dụng khi chạy từ
+    # IDE. spring-boot-devtools tự nạp một bộ giá trị mặc định "tiện cho lập
+    # trình viên", trong đó có server.error.include-stacktrace = always, và bộ
+    # đó ghi đè application.yml.
+    #
+    # Hệ quả đã đo được trên cùng một mã nguồn, cùng một yêu cầu GET /p/<slug sai>:
+    #   java -jar   -> 404, phản hồi 102 byte, không có "trace"
+    #   IntelliJ    -> 404, phản hồi 10.910 byte, có nguyên stack trace
+    # Khác nhau vì spring-boot-maven-plugin loại devtools khỏi jar, còn IDE nạp
+    # nó theo classpath. Bộ kiểm thử Postman chạy vào bản IDE nên báo vi phạm
+    # NFR-S05, trong khi bản triển khai thật vẫn an toàn.
+    add-properties: false
+
   # Kéo file application-local.yml (gitignored) chứa secret thật vào lúc chạy.
   # "optional:" => thiếu file vẫn boot được (teammate chưa có secret vẫn chạy local login).
   config:
@@ -77,6 +91,7 @@ server:
     include-message: never
     include-binding-errors: never
     include-exception: false
+
 
 # ====== LOG ======
 logging:
