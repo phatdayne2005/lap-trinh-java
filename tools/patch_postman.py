@@ -502,3 +502,67 @@ pr["item"].insert(0, request_lam_moi_csrf("TC-PR-00"))
 print("  [10] noi long TC-ONB-05, sua ban chat TC-MEN-05, lam moi CSRF dau thu muc 08")
 
 FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+# =====================================================================
+# GHI CHÚ: đã thử và ĐÃ BỎ một vòng vá nữa, chép lại để không ai làm lại
+# =====================================================================
+# Từng thử ba thay đổi sau, kết quả xấu hơn (12 -> 21 assertion fail) nên đã bỏ:
+#
+#   1. Ghi biến bằng pm.environment.set song song với pm.collectionVariables.set,
+#      hòng ép {{skillNodeId}} nhận giá trị mới. Biến environment sống suốt lượt
+#      chạy nên skillNodeId của roadmap rò sang thư mục 10, làm TC-CS-06 gọi
+#      /counselor/nodes/<id node roadmap>/details và nhận 400.
+#
+#   2. Đăng nhập lại STUDENT ở đầu thư mục 08. Nhờ đó thư mục 08 chạy trót lọt
+#      tới TC-PR-05 "Đổi mật khẩu" — và nó đổi mật khẩu thật. Mọi lần đăng nhập
+#      sau đó dùng studentPassword cũ nên trả /login?error.
+#
+#   3. Đổi TC-SG-05 sang URL thẳng thay cho path variable: không giải quyết được
+#      gốc vấn đề vì biến vẫn chưa có giá trị.
+#
+# Bài học: biến trong Postman phải giữ đúng phạm vi của thư mục dùng nó, và
+# không được để một thư mục làm thay đổi dữ liệu đăng nhập mà thư mục khác cần.
+
+
+# =====================================================================
+# 12. TC-PR-07 phá hỏng tài khoản kiểm thử cho MỌI lượt chạy sau
+# =====================================================================
+# Nó đổi email đăng nhập của student thành new.email.<ngẫu nhiên>@gmail.com và
+# KHÔNG trả lại. Hậu quả dây chuyền quan sát được trong CSDL:
+#   - Tài khoản student thật (id 7) mang email new.email.490@gmail.com
+#   - Địa chỉ student@gmail.com bị bỏ trống, một tài khoản đăng ký mới chiếm chỗ
+#   - Tài khoản mới đó không có onboarding, roadmap, portfolio, báo cáo nào
+#   - Lượt chạy kế tiếp đăng nhập vào đúng tài khoản rỗng đó -> hàng loạt 404 ở
+#     TC-RM-09, TC-SG-07/08/09, TC-PF-05, TC-SEC-06
+# Đây là lý do kết quả chạy Postman đổi khác nhau giữa các lần mà không ai sửa gì.
+pr = tim_thu_muc("08 ·")
+tra_lai = {
+    "name": "TC-PR-07b · POST /profile/email — Trả lại email gốc (dọn dẹp)",
+    "request": {
+        "method": "POST",
+        "header": [],
+        "body": {"mode": "urlencoded", "urlencoded": [
+            {"key": "email", "value": "{{studentEmail}}", "type": "text"},
+            {"key": "_csrf", "value": "{{csrfToken}}", "type": "text"},
+        ]},
+        "url": {"raw": "{{baseUrl}}/profile/email", "host": ["{{baseUrl}}"],
+                "path": ["profile", "email"]},
+        "description": (
+            "TC-PR-07 đổi email đăng nhập sang một địa chỉ ngẫu nhiên và không trả lại, "
+            "khiến tài khoản kiểm thử mất định danh và mọi lượt chạy sau đăng nhập vào "
+            "một tài khoản khác. Bước này trả email về giá trị trong environment để bộ "
+            "kiểm thử chạy được nhiều lần mà kết quả không đổi."),
+    },
+    "protocolProfileBehavior": {"followRedirects": False},
+    "response": [],
+    "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+        'pm.test("Đã trả email về giá trị gốc", function () {',
+        '    pm.expect(pm.response.code, "mã trạng thái").to.be.oneOf([200, 302]);',
+        '});',
+    ]}}],
+}
+pr["item"].insert(vi_tri(pr, "TC-PR-07") + 1, tra_lai)
+print("  [12] them TC-PR-07b tra lai email goc cho tai khoan kiem thu")
+
+FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
