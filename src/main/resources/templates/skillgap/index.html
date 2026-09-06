@@ -1,4 +1,22 @@
 <!DOCTYPE html>
+<!--
+  LƯU Ý: đọc số liệu từ ${result} — đối tượng SkillGapResultDTO mà SkillGapPageController
+  đặt vào model — và ${currentSkills} là thuộc tính riêng biệt.
+
+  Trước đây template tham chiếu ${analysis.*}: không có thuộc tính nào tên "analysis" được
+  đặt vào model, nên th:if="${analysis != null}" luôn sai và TOÀN BỘ khối kết quả phân tích
+  chưa bao giờ hiển thị. Người dùng chọn lộ trình xong chỉ thấy trang trống.
+  Kịch bản TC-SKG-002 của bộ kiểm thử giao diện đã bắt được lỗi này.
+
+  Hai trường ${analysis.matchPercentage} và ${analysis.priorityMissingSkills} không tồn tại
+  ở bất kỳ đâu trong mã Java. Đã ánh xạ sang ${result.matchPercent} và ${result.missingSkills}.
+  Riêng "kỹ năng ưu tiên" hiện lấy TOÀN BỘ kỹ năng còn thiếu vì chưa có quy tắc xếp ưu tiên
+  nào được định nghĩa — cần nhóm thống nhất luật rồi bổ sung vào SkillGapService.
+
+  Cũng đã bỏ nhãn "Tầng n" ở danh sách kỹ năng còn thiếu: SkillSummaryDTO chỉ có
+  id, name, category — không mang thông tin tầng. Muốn hiện lại thì phải bổ sung
+  trường tier vào DTO đó.
+-->
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/base :: head('Phân tích Khoảng cách Kỹ năng · CareerCompass')}"></head>
 <body class="bg-[#030712] font-sans text-slate-200 antialiased min-h-screen flex flex-col cyber-grid">
@@ -28,7 +46,7 @@
                 <option th:each="tpl : ${templates}"
                         th:value="${tpl.id}"
                         th:text="${tpl.name}"
-                        th:selected="${analysis != null and analysis.templateId == tpl.id}">
+                        th:selected="${result != null and result.template != null and result.template.id == tpl.id}">
                     Backend Roadmap
                 </option>
             </select>
@@ -45,7 +63,7 @@
     </div>
 
     <!-- 3-Column Analysis Cockpit -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" th:if="${analysis != null}">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" th:if="${result != null}">
         
         <!-- Column 1: Current Skills List & Add (4 cols) -->
         <div class="lg:col-span-4 cyber-card rounded-3xl p-6 sm:p-7 border border-white/[0.08] space-y-6">
@@ -55,13 +73,13 @@
                     <span>Kỹ năng đã có</span>
                 </h3>
                 <span class="text-xs font-bold font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-400/20"
-                      th:text="${analysis.currentSkills.size()}">0</span>
+                      th:text="${currentSkills.size()}">0</span>
             </div>
 
             <!-- Quick Add Skill Form -->
             <form th:action="@{/skill-gap/skills}" method="post" class="flex gap-2">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <input type="hidden" name="templateId" th:value="${analysis.templateId}">
+                <input type="hidden" name="templateId" th:value="${result.template.id}">
                 
                 <select name="skillId" id="skillId" required
                         class="flex-1 bg-[#070b16] border border-white/[0.08] rounded-xl px-3 py-2 text-xs font-semibold text-slate-200 focus:border-cyan-400 focus:outline-none">
@@ -75,7 +93,7 @@
 
             <!-- Skill List -->
             <div class="space-y-2 max-h-96 overflow-y-auto pr-1">
-                <div th:each="sk : ${analysis.currentSkills}"
+                <div th:each="sk : ${currentSkills}"
                      class="flex items-center justify-between p-3 rounded-2xl bg-[#070b16] border border-white/[0.04] hover:border-cyan-400/30 transition">
                     <div>
                         <p class="text-xs font-bold text-slate-200" th:text="${sk.name}">Java</p>
@@ -83,7 +101,7 @@
                     </div>
                     <form th:action="@{'/skill-gap/skills/' + ${sk.id} + '/delete'}" method="post">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                        <input type="hidden" name="templateId" th:value="${analysis.templateId}">
+                        <input type="hidden" name="templateId" th:value="${result.template.id}">
                         <button type="submit" class="text-slate-500 hover:text-rose-400 p-1 transition cursor-pointer" title="Xóa">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
@@ -105,7 +123,7 @@
             <div class="text-center py-6">
                 <div class="relative w-36 h-36 mx-auto flex items-center justify-center rounded-full bg-[#070b16] border-4 border-cyan-400/30 shadow-[0_0_30px_rgba(6,182,212,0.3)]">
                     <div class="text-center">
-                        <span class="text-3xl sm:text-4xl font-black text-white tracking-tight" th:text="${analysis.matchPercentage} + '%'">0%</span>
+                        <span class="text-3xl sm:text-4xl font-black text-white tracking-tight" th:text="${result.matchPercent} + '%'">0%</span>
                         <span class="block text-[10px] font-bold text-cyan-400 uppercase tracking-wider mt-0.5">Mức độ khớp</span>
                     </div>
                 </div>
@@ -113,19 +131,19 @@
                 <div class="mt-6 grid grid-cols-2 gap-3 text-left">
                     <div class="p-3.5 rounded-2xl bg-[#070b16] border border-white/[0.04]">
                         <span class="text-[10px] text-slate-500 font-bold uppercase block">Đã đạt</span>
-                        <span class="text-lg font-black text-emerald-400" th:text="${analysis.matchedSkills.size()} + ' kỹ năng'">0</span>
+                        <span class="text-lg font-black text-emerald-400" th:text="${result.matchedSkills.size()} + ' kỹ năng'">0</span>
                     </div>
                     <div class="p-3.5 rounded-2xl bg-[#070b16] border border-white/[0.04]">
                         <span class="text-[10px] text-slate-500 font-bold uppercase block">Còn thiếu</span>
-                        <span class="text-lg font-black text-rose-400" th:text="${analysis.missingSkills.size()} + ' kỹ năng'">0</span>
+                        <span class="text-lg font-black text-rose-400" th:text="${result.missingSkills.size()} + ' kỹ năng'">0</span>
                     </div>
                 </div>
             </div>
 
             <!-- PDF Export Form -->
-            <form th:action="@{/skill-gap/reports}" method="post">
+            <form data-testid="form-luu-bao-cao" th:action="@{/skill-gap/reports}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <input type="hidden" name="templateId" th:value="${analysis.templateId}">
+                <input type="hidden" name="templateId" th:value="${result.template.id}">
                 <button type="submit" class="w-full py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white text-xs font-black shadow-lg shadow-violet-500/25 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     <span>Xuất báo cáo PDF phân tích</span>
@@ -141,19 +159,19 @@
                     <span>Kỹ năng cần ưu tiên học</span>
                 </h3>
                 <span class="text-xs font-bold font-mono px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-400/20"
-                      th:text="${analysis.priorityMissingSkills.size()}">0</span>
+                      th:text="${result.missingSkills.size()}">0</span>
             </div>
 
             <!-- Priority Gaps List -->
             <div class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
-                <div th:if="${analysis.priorityMissingSkills.isEmpty()}" class="py-6 text-center text-xs text-emerald-400 italic font-semibold">
+                <div th:if="${result.missingSkills.isEmpty()}" class="py-6 text-center text-xs text-emerald-400 italic font-semibold">
                     ✓ Bạn đã hoàn thành tất cả kỹ năng cốt lõi cho vị trí này!
                 </div>
-                <div th:each="ps : ${analysis.priorityMissingSkills}"
+                <div th:each="ps : ${result.missingSkills}"
                      class="p-3 rounded-2xl bg-[#070b16] border border-rose-500/20 flex items-center justify-between">
                     <div>
-                        <span class="text-xs font-bold text-rose-300" th:text="${ps.skillName}">Docker</span>
-                        <p class="text-[10px] text-slate-500" th:text="'Tầng ' + ${ps.tier} + ' &middot; ' + ${ps.category}">Tầng 1</p>
+                        <span class="text-xs font-bold text-rose-300" th:text="${ps.name}">Docker</span>
+                        <p class="text-[10px] text-slate-500" th:text="${ps.category}">Danh mục</p>
                     </div>
                     <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Ưu tiên cao</span>
                 </div>
@@ -173,7 +191,7 @@
                        class="flex items-center justify-between p-2.5 rounded-xl bg-[#070b16] border border-white/[0.04] hover:border-cyan-400/30 transition text-xs group">
                         <div class="truncate">
                             <span class="font-bold text-slate-200 group-hover:text-cyan-300" th:text="'Report #' + ${rep.id}">Report</span>
-                            <p class="text-[10px] font-mono text-slate-500" th:text="${#temporals.format(rep.generatedAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</p>
+                            <p class="text-[10px] font-mono text-slate-500" th:text="${#temporals.format(rep.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</p>
                         </div>
                         <span class="text-cyan-400 text-xs font-bold">Tải về ↓</span>
                     </a>

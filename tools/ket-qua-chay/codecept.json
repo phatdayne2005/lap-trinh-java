@@ -2,12 +2,12 @@
  "stats": {
   "suites": 8,
   "tests": 17,
-  "passes": 14,
+  "passes": 17,
   "pending": 0,
-  "failures": 3,
-  "start": "2026-09-06T13:16:23.728Z",
-  "end": "2026-09-06T13:18:10.896Z",
-  "duration": 107168
+  "failures": 0,
+  "start": "2026-09-06T13:56:26.873Z",
+  "end": "2026-09-06T13:57:57.924Z",
+  "duration": 91051
  },
  "tests": [
   {
@@ -16,7 +16,7 @@
    "tags": "@P1",
    "feature": "Quản trị người dùng",
    "file": "admin_test.js",
-   "giay": 3.4,
+   "giay": 2.2,
    "status": "PASS",
    "loi": ""
   },
@@ -26,7 +26,7 @@
    "tags": "@P1",
    "feature": "Quản trị người dùng",
    "file": "admin_test.js",
-   "giay": 5.3,
+   "giay": 5.0,
    "status": "PASS",
    "loi": ""
   },
@@ -36,9 +36,9 @@
    "tags": "@P1 @known-bug",
    "feature": "Quản trị người dùng",
    "file": "admin_test.js",
-   "giay": 6.8,
-   "status": "FAIL",
-   "loi": "Element \"input[name=keyword]\" is not visible on page."
+   "giay": 6.5,
+   "status": "PASS",
+   "loi": ""
   },
   {
    "ma": "TC-AUTH-001",
@@ -46,7 +46,7 @@
    "tags": "@P0 @smoke",
    "feature": "Xác thực tài khoản",
    "file": "auth_test.js",
-   "giay": 4.4,
+   "giay": 3.9,
    "status": "PASS",
    "loi": ""
   },
@@ -56,7 +56,7 @@
    "tags": "@P0",
    "feature": "Xác thực tài khoản",
    "file": "auth_test.js",
-   "giay": 4.5,
+   "giay": 4.4,
    "status": "PASS",
    "loi": ""
   },
@@ -66,7 +66,7 @@
    "tags": "@P0 @smoke",
    "feature": "Xác thực tài khoản",
    "file": "auth_test.js",
-   "giay": 5.0,
+   "giay": 2.1,
    "status": "PASS",
    "loi": ""
   },
@@ -76,8 +76,8 @@
    "tags": "@P1",
    "feature": "Trang tổng quan",
    "file": "dashboard_test.js",
-   "giay": 6.4,
-   "status": "FAIL",
+   "giay": 5.4,
+   "status": "PASS",
    "loi": ""
   },
   {
@@ -86,7 +86,7 @@
    "tags": "@P0 @smoke",
    "feature": "Luồng khởi tạo hồ sơ (Onboarding)",
    "file": "onboarding_test.js",
-   "giay": 5.7,
+   "giay": 5.2,
    "status": "PASS",
    "loi": ""
   },
@@ -96,7 +96,7 @@
    "tags": "@P0",
    "feature": "Luồng khởi tạo hồ sơ (Onboarding)",
    "file": "onboarding_test.js",
-   "giay": 4.8,
+   "giay": 4.4,
    "status": "PASS",
    "loi": ""
   },
@@ -106,7 +106,7 @@
    "tags": "@P1",
    "feature": "Hồ sơ cá nhân",
    "file": "profile_test.js",
-   "giay": 10.7,
+   "giay": 9.4,
    "status": "PASS",
    "loi": ""
   },
@@ -116,7 +116,7 @@
    "tags": "@P1",
    "feature": "Hồ sơ cá nhân",
    "file": "profile_test.js",
-   "giay": 6.2,
+   "giay": 5.6,
    "status": "PASS",
    "loi": ""
   },
@@ -126,7 +126,7 @@
    "tags": "@P1",
    "feature": "Lộ trình học tập",
    "file": "roadmap_test.js",
-   "giay": 5.7,
+   "giay": 5.4,
    "status": "PASS",
    "loi": ""
   },
@@ -136,7 +136,7 @@
    "tags": "@P1",
    "feature": "Lộ trình học tập",
    "file": "roadmap_test.js",
-   "giay": 7.3,
+   "giay": 6.0,
    "status": "PASS",
    "loi": ""
   },
@@ -146,7 +146,7 @@
    "tags": "@P0 @smoke",
    "feature": "Phân quyền và bảo mật truy cập",
    "file": "security_test.js",
-   "giay": 4.4,
+   "giay": 4.0,
    "status": "PASS",
    "loi": ""
   },
@@ -156,7 +156,7 @@
    "tags": "@P0 @smoke",
    "feature": "Phân quyền và bảo mật truy cập",
    "file": "security_test.js",
-   "giay": 1.0,
+   "giay": 0.9,
    "status": "PASS",
    "loi": ""
   },
@@ -166,7 +166,7 @@
    "tags": "@P1",
    "feature": "Phân tích khoảng trống kỹ năng",
    "file": "skillgap_test.js",
-   "giay": 5.8,
+   "giay": 5.5,
    "status": "PASS",
    "loi": ""
   },
@@ -176,9 +176,9 @@
    "tags": "@P1",
    "feature": "Phân tích khoảng trống kỹ năng",
    "file": "skillgap_test.js",
-   "giay": 16.1,
-   "status": "FAIL",
-   "loi": "element (form[action*=\"/skill-gap/reports\"] button[type=submit]) still not present on page after 10 sec locator.waitFor: Timeout 10000ms exceeded. Call log: \u001b[2m - waiti"
+   "giay": 13.2,
+   "status": "PASS",
+   "loi": ""
   }
  ]
 }

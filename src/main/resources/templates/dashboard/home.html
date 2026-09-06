@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<!--
+  LƯU Ý: mọi số liệu thống kê phải đọc từ ${dashboard} — đối tượng DashboardViewDTO mà
+  DashboardController đặt vào model. Trước đây template tham chiếu các biến cấp cao
+  ${progressPercentage}, ${completedNodes}, ${totalNodes}, ${matchedSkillsCount},
+  ${activities} — không có biến nào trong số đó được đặt ở đâu cả, nên ba ô thống kê
+  hiển thị "null%", "(null/null nodes)" và một ô trống với MỌI người dùng.
+  Kịch bản TC-DSB-001 của bộ kiểm thử giao diện đã bắt được lỗi này.
+
+  Sửa xong mới lộ tiếp một lỗi ẩn: vòng lặp nhật ký hoạt động trước đây không bao
+  giờ chạy (vì ${activities} luôn null), nên không ai thấy nó đọc ${act.activityType}
+  trong khi ActivityLogDTO chỉ có trường 'type'. Một lỗi che mất một lỗi khác.
+-->
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/base :: head('Dashboard · CareerCompass')}"></head>
 <body class="bg-[#030712] font-sans text-slate-200 antialiased min-h-screen flex flex-col cyber-grid">
@@ -24,7 +36,7 @@
                 </h1>
                 <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
                     Mục tiêu định hướng hiện tại: 
-                    <strong class="font-extrabold text-cyan-400" th:text="${careerGoal}">Chưa xác định</strong>.
+                    <strong class="font-extrabold text-cyan-400" th:text="${careerGoal} ?: 'Chưa xác định'">Chưa xác định</strong>.
                     Theo dõi sát lộ trình và tham vấn cùng AI Mentor để nâng cấp kỹ năng.
                 </p>
             </div>
@@ -54,13 +66,13 @@
                     </div>
                 </div>
                 <div class="flex items-baseline gap-2 mb-2">
-                    <span class="text-3xl sm:text-4xl font-black text-white" th:text="${progressPercentage} + '%'">0%</span>
-                    <span class="text-xs text-slate-400 font-semibold" th:text="'(' + ${completedNodes} + '/' + ${totalNodes} + ' nodes)'">(0/0 nodes)</span>
+                    <span data-testid="tien-do-lo-trinh" class="text-3xl sm:text-4xl font-black text-white" th:text="${dashboard.roadmapCompletionPercent} + '%'">0%</span>
+                    <span data-testid="so-node-hoan-thanh" class="text-xs text-slate-400 font-semibold" th:text="'(' + ${dashboard.completedNodes} + '/' + ${dashboard.totalNodes} + ' nodes)'">(0/0 nodes)</span>
                 </div>
                 <!-- Neon progress bar -->
                 <div class="w-full bg-[#070b16] rounded-full h-2.5 overflow-hidden border border-white/[0.05] p-0.5">
                     <div class="bg-gradient-to-r from-cyan-400 to-indigo-500 h-full rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(6,182,212,0.6)]"
-                         th:style="'width: ' + ${progressPercentage} + '%'"></div>
+                         th:style="'width: ' + ${dashboard.roadmapCompletionPercent} + '%'"></div>
                 </div>
             </div>
             <a th:href="@{/roadmap}" class="mt-5 text-xs text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1">
@@ -79,7 +91,7 @@
                     </div>
                 </div>
                 <div class="flex items-baseline gap-2 mb-2">
-                    <span class="text-3xl sm:text-4xl font-black text-white" th:text="${matchedSkillsCount}">0</span>
+                    <span data-testid="so-ky-nang-nam-vung" class="text-3xl sm:text-4xl font-black text-white" th:text="${dashboard.matchedSkillCount}">0</span>
                     <span class="text-xs text-slate-400 font-semibold">kỹ năng đã xác thực</span>
                 </div>
                 <p class="text-xs text-slate-400">Đối sánh tự động với bộ tiêu chuẩn tuyển dụng IT của UTH.</p>
@@ -122,12 +134,12 @@
             <span class="text-xs text-slate-400 font-mono">Live Timeline</span>
         </div>
 
-        <div th:if="${activities == null or activities.isEmpty()}" class="py-10 text-center text-slate-500 text-xs sm:text-sm">
+        <div th:if="${dashboard.recentActivities == null or dashboard.recentActivities.isEmpty()}" class="py-10 text-center text-slate-500 text-xs sm:text-sm">
             Chưa có hoạt động nào được ghi nhận. Hãy bắt đầu học tập và cập nhật lộ trình!
         </div>
 
-        <div th:if="${activities != null and !activities.isEmpty()}" class="space-y-4">
-            <div th:each="act : ${activities}" class="flex items-start gap-4 p-3.5 rounded-2xl bg-[#070b16] border border-white/[0.04] hover:border-cyan-400/30 transition">
+        <div th:if="${dashboard.recentActivities != null and !dashboard.recentActivities.isEmpty()}" class="space-y-4">
+            <div th:each="act : ${dashboard.recentActivities}" class="flex items-start gap-4 p-3.5 rounded-2xl bg-[#070b16] border border-white/[0.04] hover:border-cyan-400/30 transition">
                 <div class="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-400/20 text-cyan-400 flex items-center justify-center shrink-0 mt-0.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
@@ -136,7 +148,7 @@
                         <p class="text-xs sm:text-sm font-bold text-slate-200" th:text="${act.description}">Mô tả hoạt động</p>
                         <span class="text-[11px] font-mono text-slate-500" th:text="${#temporals.format(act.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</span>
                     </div>
-                    <span class="inline-block mt-1 text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-400" th:text="${act.activityType}">TYPE</span>
+                    <span class="inline-block mt-1 text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-400" th:text="${act.type}">TYPE</span>
                 </div>
             </div>
         </div>

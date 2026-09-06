@@ -12,7 +12,8 @@ Scenario(
     dashboardPage.seeDashboard();
 
     // Dashboard gom dữ liệu từ roadmap + skill gap + activity log.
-    I.see('node hoàn thành');
-    I.see('kỹ năng còn thiếu');
+    // Kiểm theo data-testid thay vì câu chữ: nhãn hiển thị đã đổi một lần
+    // ("node hoàn thành" -> "Tiến độ Lộ trình") và làm kịch bản đỏ oan.
+    dashboardPage.seeThongKe();
   },
 );

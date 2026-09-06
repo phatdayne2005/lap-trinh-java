@@ -344,12 +344,12 @@ r += 1
 r = thanh(ws, r, "BẢNG 3 — TỔNG SỐ PHÉP KIỂM ĐÃ CHẠY")
 r = tieu_de(ws, r, ["Tầng", "Đơn vị đếm", "Số lượng", "Không đạt", "", "Ghi chú", "", ""])
 for tang, dv, n, fail, ghi in [
-    ("Đơn vị (JUnit)", "test method", 370, 0,
+    ("Đơn vị (JUnit)", "test method", 371, 0,
      "Toàn bộ dự án, gồm cả hộp đen và hộp trắng"),
     ("Tích hợp (Postman)", "phép kiểm", pm_stats["assertions"]["total"], 0,
      "Chạy trên cơ sở dữ liệu vừa gieo lại"),
     ("Hệ thống (CodeceptJS)", "kịch bản", st["tests"], st["failures"],
-     "1 lỗi ứng dụng thật, 2 kịch bản lỗi thời sau khi giao diện đổi"),
+     "Ba kịch bản từng đỏ đều là lỗi ứng dụng thật, nay đã sửa xong"),
 ]:
     o(ws, r, 1, tang, bold=True)
     o(ws, r, 2, dv)
@@ -360,7 +360,7 @@ for tang, dv, n, fail, ghi in [
     ws.row_dimensions[r].height = 30
     r += 1
 r += 1
-r = thanh(ws, r, "Tám khiếm khuyết được phát hiện, bảy đã khắc phục kèm test hồi quy. "
+r = thanh(ws, r, "Mười khiếm khuyết được phát hiện và đều đã khắc phục kèm test hồi quy. "
                  "Chi tiết ở sheet 07. Khiem khuyet.",
            fill=None, color="595959", size=9, italic=True, cao=24)
 
@@ -386,8 +386,11 @@ KHIEM_KHUYET = [
      "Kiểm thử giao diện — TC-ADM-003",
      "Sau khi chạy, admin@gmail.com mang vai trò STUDENT trong CSDL; bảy phép kiểm thư mục "
      "Admin của Postman đỏ theo.",
-     "CHƯA SỬA", "Chặn ở tầng dịch vụ khi id người bị đổi trùng id người đang đăng nhập.",
-     C_FAIL),
+     "ĐÃ SỬA",
+     "Thêm requireNotCurrentUser vào changeUserRole — hai thao tác nguy hiểm tương tự là tự "
+     "khoá và tự xoá đã được chặn từ trước, riêng đổi vai trò bị bỏ sót. Kèm test hồi quy "
+     "changeUserRole_whenTargetIsCurrentUser_throwsAndDoesNotSave.",
+     C_PASS),
     ("DEF-002", "Cao",
      "Phản hồi lỗi trả về nguyên stack trace: tên package, tên lớp, số dòng, và cả câu "
      "INSERT khi vi phạm khoá duy nhất. Vi phạm NFR-S05.",
@@ -439,6 +442,29 @@ KHIEM_KHUYET = [
      "Bảng quyết định — đối chiếu từng cột",
      "PasswordResetServiceTest sẵn có chỉ phủ R1 và R2.",
      "ĐÃ SỬA", "Bổ sung TokenValidityDecisionTableTest phủ đủ bốn luật.", C_PASS),
+    ("DEF-009", "Cao",
+     "Toàn bộ khối thống kê trên trang tổng quan hiển thị sai: tiến độ lộ trình ra \"null%\", "
+     "số node ra \"(null/null nodes)\", ô kỹ năng nắm vững để trống, và danh sách hoạt động "
+     "gần đây không bao giờ hiện.",
+     "Kiểm thử giao diện — TC-DSB-001",
+     "Template đọc ${progressPercentage}, ${completedNodes}, ${totalNodes}, "
+     "${matchedSkillsCount}, ${activities} — không thuộc tính nào trong số đó được đặt vào "
+     "model; DashboardController chỉ đặt ${dashboard}.",
+     "ĐÃ SỬA",
+     "Trỏ template vào ${dashboard.*}. Sửa xong mới lộ thêm ${act.activityType} trong khi "
+     "ActivityLogDTO chỉ có trường type — một lỗi che mất một lỗi khác vì vòng lặp trước đây "
+     "không bao giờ chạy.", C_PASS),
+    ("DEF-010", "Cao",
+     "Toàn bộ khối kết quả phân tích khoảng trống kỹ năng chưa bao giờ hiển thị. Người dùng "
+     "chọn lộ trình xong chỉ thấy trang trống, không có tỷ lệ khớp, không có nút lưu báo cáo.",
+     "Kiểm thử giao diện — TC-SKG-002",
+     "Template bọc mọi thứ trong th:if=\"${analysis != null}\" nhưng controller đặt "
+     "${result}; hai trường ${analysis.matchPercentage} và ${analysis.priorityMissingSkills} "
+     "không tồn tại ở bất kỳ đâu trong mã Java.",
+     "ĐÃ SỬA",
+     "Ánh xạ sang ${result} và ${currentSkills}. Sửa xong lộ tiếp ba trường lệch nữa: "
+     "ps.skillName, ps.tier, rep.generatedAt. Riêng \"kỹ năng ưu tiên\" tạm lấy toàn bộ kỹ "
+     "năng còn thiếu vì chưa có quy tắc xếp ưu tiên nào được định nghĩa.", C_PASS),
 ]
 for ma, muc, mo_ta, kt, bc, tt, cach, mau in KHIEM_KHUYET:
     o(ws, r, 1, ma, bold=True)
@@ -453,10 +479,12 @@ for ma, muc, mo_ta, kt, bc, tt, cach, mau in KHIEM_KHUYET:
     ws.row_dimensions[r].height = 78
     r += 1
 r += 1
-r = thanh(ws, r, "Bảy trên tám khiếm khuyết đã được khắc phục và có test hồi quy đi kèm. "
-                 "DEF-001 cố ý giữ nguyên và gắn nhãn @known-bug để minh hoạ đúng quy trình: "
-                 "kiểm thử ghi nhận lỗi trước, việc sửa thuộc về đợt phát triển kế tiếp.",
-           fill=None, color="595959", size=9, italic=True, cao=34)
+r = thanh(ws, r, "Cả mười khiếm khuyết đã được khắc phục và có test hồi quy đi kèm. Ba khiếm "
+                 "khuyết DEF-001, DEF-009 và DEF-010 đều do KIỂM THỬ GIAO DIỆN tìm ra — đây là "
+                 "tầng duy nhất chạm tới HTML nên là tầng duy nhất thấy được rằng template đang "
+                 "đọc những thuộc tính không hề tồn tại trong model. Unit test và kiểm thử API "
+                 "không thể phát hiện loại lỗi này vì chúng không render giao diện.",
+           fill=None, color="595959", size=9, italic=True, cao=44)
 
 
 # =====================================================================

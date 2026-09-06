@@ -32,6 +32,8 @@ Scenario(
     await newStudentReady({ I, registerPage, loginPage, onboardingPage });
 
     skillGapPage.open();
+    // Phải chạy phân tích trước: form lưu báo cáo chỉ render khi đã có kết quả.
+    skillGapPage.chonLoTrinhDauTien();
     skillGapPage.saveReport();
 
     I.seeInCurrentUrl('/skill-gap');

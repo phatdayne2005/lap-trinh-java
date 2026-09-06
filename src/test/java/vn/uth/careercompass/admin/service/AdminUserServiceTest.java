@@ -225,6 +225,30 @@ class AdminUserServiceTest {
                 .hasMessage("Không tìm thấy người dùng có ID: 99");
     }
 
+    /**
+     * Test hồi quy cho DEF-001.
+     *
+     * <p>Trước khi sửa, quản trị viên tự hạ được vai trò của chính mình xuống STUDENT rồi
+     * mất luôn quyền vào {@code /admin}, và không có đường quay lại qua giao diện — phải
+     * sửa thẳng trong cơ sở dữ liệu. Kịch bản giao diện {@code TC-ADM-003} đã tái hiện
+     * đúng tình huống này: sau khi chạy, tài khoản admin mang vai trò STUDENT thật.
+     *
+     * <p>Hai thao tác nguy hiểm tương tự là tự khoá và tự xoá đã được chặn từ trước; riêng
+     * đổi vai trò bị bỏ sót.
+     */
+    @Test
+    void changeUserRole_whenTargetIsCurrentUser_throwsAndDoesNotSave() {
+        User self = buildUser(1L, "admin@uth.edu.vn", true);
+        loginAs("admin@uth.edu.vn");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(self));
+
+        assertThatThrownBy(() -> adminUserService.changeUserRole(1L, "student"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Bạn không thể tự đổi vai trò của chính mình!");
+
+        verify(userRepository, never()).save(any(User.class));
+    }
+
     // ============================================================================
     // deleteUser(userId)
     // ============================================================================

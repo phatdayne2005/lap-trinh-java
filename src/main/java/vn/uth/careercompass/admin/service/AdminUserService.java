@@ -58,6 +58,11 @@ public class AdminUserService {
     public User changeUserRole(Long userId, String roleNameStr) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng có ID: " + userId));
+        // DEF-001: thiếu đúng dòng này nên quản trị viên tự hạ được vai trò của chính mình
+        // xuống STUDENT, mất luôn quyền vào /admin và KHÔNG có đường quay lại qua giao diện —
+        // muốn khôi phục phải sửa thẳng trong cơ sở dữ liệu. Hai thao tác nguy hiểm tương tự
+        // là tự khoá và tự xoá thì đã được chặn từ trước; đổi vai trò bị bỏ sót.
+        requireNotCurrentUser(user, "Bạn không thể tự đổi vai trò của chính mình!");
         RoleName roleName = RoleName.valueOf(roleNameStr.toUpperCase());
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vai trò: " + roleName));
