@@ -23,6 +23,11 @@ jobs:
     name: Build and Test (Java 21 & Maven)
     runs-on: ubuntu-latest
 
+    # Khai ở cấp job chứ không cấp step: biểu thức 'if' của một step chỉ đọc được
+    # env của workflow và của job, không đọc được env của chính step đó.
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
     services:
       mysql:
         image: mysql:8.0
@@ -40,6 +45,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # SonarCloud cần toàn bộ lịch sử git để biết dòng nào là "code mới"
+          # và ai sửa. Bản checkout mặc định chỉ lấy 1 commit nên Sonar sẽ cảnh báo
+          # rồi coi cả dự án là code mới.
+          fetch-depth: 0
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -47,6 +57,13 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
       - name: Fix line endings and permissions for mvnw
         run: |
@@ -64,6 +81,27 @@ jobs:
           MAIL_USERNAME: mock@gmail.com
           MAIL_PASSWORD: mockpassword
         run: ./mvnw clean verify -DskipTests=false
+
+      # ----------------------------------------------------------
+      # Phân tích chất lượng mã nguồn trên SonarCloud.
+      #
+      # Chạy Ở ĐÂY chứ không tách job riêng, vì bước trên vừa sinh
+      # target/site/jacoco/jacoco.xml — tách job thì phải chạy lại toàn bộ
+      # test chỉ để có file đó. Không có 'clean' để giữ nguyên target/.
+      #
+      # Cần một secret duy nhất: Settings > Secrets and variables > Actions
+      # > New repository secret, tên SONAR_TOKEN, giá trị là User Token lấy ở
+      # SonarCloud > My Account > Security. Nhờ vậy không ai trong nhóm phải
+      # tự tạo token hay cài Docker để chạy Sonar ở máy mình.
+      #
+      # Điều kiện 'if' để nhánh fork hoặc repo chưa cấu hình secret thì bỏ qua
+      # bước này thay vì đỏ cả pipeline.
+      # ----------------------------------------------------------
+      - name: SonarCloud Scan
+        if: env.SONAR_TOKEN != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # để Sonar bình luận vào pull request
+        run: ./mvnw sonar:sonar -Dsonar.token="$SONAR_TOKEN"
 
       - name: Upload JAR Artifact
         if: success()
