@@ -801,38 +801,6 @@
           ]
         },
         {
-          "name": "TC-AUTH-15b · GET /login — Làm mới CSRF token trước khi đăng nhập",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "login"
-              ]
-            },
-            "description": "Bước bắt buộc trước mọi POST /login. Spring Security xoay CSRF token mỗi khi phiên thay đổi (đăng xuất, đăng nhập). Script cấp collection chỉ trích token từ phản hồi HTML, mà 302 của /logout và /login không có body, nên nếu không có bước này thì lần đăng nhập kế tiếp dùng token cũ và bị từ chối."
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"200 OK — đã lấy được CSRF token mới\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    pm.expect(pm.collectionVariables.get(\"csrfToken\")).to.be.a(\"string\").and.not.empty;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
           "name": "TC-AUTH-16 · POST /login — Đăng nhập ADMIN",
           "request": {
             "method": "POST",
@@ -894,38 +862,6 @@
           "protocolProfileBehavior": {
             "followRedirects": false
           }
-        },
-        {
-          "name": "TC-AUTH-16b · GET /login — Làm mới CSRF token trước khi đăng nhập",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "login"
-              ]
-            },
-            "description": "Bước bắt buộc trước mọi POST /login. Spring Security xoay CSRF token mỗi khi phiên thay đổi (đăng xuất, đăng nhập). Script cấp collection chỉ trích token từ phản hồi HTML, mà 302 của /logout và /login không có body, nên nếu không có bước này thì lần đăng nhập kế tiếp dùng token cũ và bị từ chối."
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"200 OK — đã lấy được CSRF token mới\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    pm.expect(pm.collectionVariables.get(\"csrfToken\")).to.be.a(\"string\").and.not.empty;",
-                  "});"
-                ]
-              }
-            }
-          ]
         },
         {
           "name": "TC-AUTH-16b · GET /login — Làm mới CSRF token trước khi đăng nhập",
@@ -1055,38 +991,6 @@
           ]
         },
         {
-          "name": "TC-AUTH-17b · GET /login — Làm mới CSRF token trước khi đăng nhập",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "login"
-              ]
-            },
-            "description": "Bước bắt buộc trước mọi POST /login. Spring Security xoay CSRF token mỗi khi phiên thay đổi (đăng xuất, đăng nhập). Script cấp collection chỉ trích token từ phản hồi HTML, mà 302 của /logout và /login không có body, nên nếu không có bước này thì lần đăng nhập kế tiếp dùng token cũ và bị từ chối."
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"200 OK — đã lấy được CSRF token mới\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    pm.expect(pm.collectionVariables.get(\"csrfToken\")).to.be.a(\"string\").and.not.empty;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
           "name": "TC-AUTH-18 · POST /login — Đăng nhập lại STUDENT cho các thư mục nghiệp vụ",
           "request": {
             "method": "POST",
@@ -1155,38 +1059,6 @@
       "name": "01 · Onboarding (3 bước)",
       "description": "Chọn vai trò mục tiêu · Upload bảng điểm & GitHub · Chọn kỹ năng hiện có. (FR2.1, FR1.3, FR3.1)",
       "item": [
-        {
-          "name": "TC-ONB-00 · GET /login — Làm mới CSRF token trước khi đăng nhập",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "login"
-              ]
-            },
-            "description": "Bước bắt buộc trước mọi POST /login. Spring Security xoay CSRF token mỗi khi phiên thay đổi (đăng xuất, đăng nhập). Script cấp collection chỉ trích token từ phản hồi HTML, mà 302 của /logout và /login không có body, nên nếu không có bước này thì lần đăng nhập kế tiếp dùng token cũ và bị từ chối."
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"200 OK — đã lấy được CSRF token mới\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    pm.expect(pm.collectionVariables.get(\"csrfToken\")).to.be.a(\"string\").and.not.empty;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
         {
           "name": "TC-ONB-00 · GET /login — Làm mới CSRF token trước khi đăng nhập",
           "request": {
@@ -1416,38 +1288,6 @@
           "protocolProfileBehavior": {
             "followRedirects": false
           }
-        },
-        {
-          "name": "TC-ONB-04b · GET /login — Làm mới CSRF token trước khi đăng nhập",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "login"
-              ]
-            },
-            "description": "Bước bắt buộc trước mọi POST /login. Spring Security xoay CSRF token mỗi khi phiên thay đổi (đăng xuất, đăng nhập). Script cấp collection chỉ trích token từ phản hồi HTML, mà 302 của /logout và /login không có body, nên nếu không có bước này thì lần đăng nhập kế tiếp dùng token cũ và bị từ chối."
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"200 OK — đã lấy được CSRF token mới\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    pm.expect(pm.collectionVariables.get(\"csrfToken\")).to.be.a(\"string\").and.not.empty;",
-                  "});"
-                ]
-              }
-            }
-          ]
         },
         {
           "name": "TC-ONB-04b · GET /login — Làm mới CSRF token trước khi đăng nhập",
@@ -2033,12 +1873,6 @@
                   "pm.test(\"Có template thật (không phải template do kiểm thử tạo ra)\", function () {",
                   "    pm.expect(that.length, \"số template thật\").to.be.above(0);",
                   "});",
-                  "if (that.length) { pm.collectionVariables.set(\"templateId\", that[0].id); }",
-                  "",
-                  "const that = pm.response.json().filter(t => (t.name || \"\").indexOf(\"(test)\") === -1);",
-                  "pm.test(\"Có template thật (không phải template do kiểm thử tạo ra)\", function () {",
-                  "    pm.expect(that.length, \"số template thật\").to.be.above(0);",
-                  "});",
                   "if (that.length) { pm.collectionVariables.set(\"templateId\", that[0].id); }"
                 ]
               }
@@ -2135,19 +1969,6 @@
                   "        pm.collectionVariables.set(\"skillNodeId\", target.id);",
                   "    }",
                   "});",
-                  "",
-                  "// skillNodeId trước đây cứng bằng 1 nên TC-RM-04 và TC-RM-10 trả 404.",
-                  "// Node của roadmap có trường \"status\" (NOT_STARTED/IN_PROGRESS/DONE) — dùng dấu",
-                  "// hiệu đó để nhặt đúng id node, không nhầm với id template hay id kỹ năng.",
-                  "const idNode = [];",
-                  "(function quet(o) {",
-                  "    if (Array.isArray(o)) { o.forEach(quet); return; }",
-                  "    if (o && typeof o === \"object\") {",
-                  "        if (typeof o.id === \"number\" && typeof o.status === \"string\") { idNode.push(o.id); }",
-                  "        Object.values(o).forEach(quet);",
-                  "    }",
-                  "})(pm.response.json());",
-                  "if (idNode.length) { pm.collectionVariables.set(\"skillNodeId\", String(idNode[0])); }",
                   "",
                   "// skillNodeId trước đây cứng bằng 1 nên TC-RM-04 và TC-RM-10 trả 404.",
                   "// Node của roadmap có trường \"status\" (NOT_STARTED/IN_PROGRESS/DONE) — dùng dấu",
@@ -2877,11 +2698,6 @@
                   "// Lấy id báo cáo vừa tạo; trước đây reportId cứng bằng 1 nên TC-SG-05 trả 404.",
                   "const bc = pm.response.json();",
                   "if (bc && bc.id) { pm.collectionVariables.set(\"reportId\", String(bc.id)); }",
-                  "if (bc && bc.id) { pm.collectionVariables.set(\"reportIdVuaTao\", String(bc.id)); }",
-                  "",
-                  "// Lấy id báo cáo vừa tạo; trước đây reportId cứng bằng 1 nên TC-SG-05 trả 404.",
-                  "const bc = pm.response.json();",
-                  "if (bc && bc.id) { pm.collectionVariables.set(\"reportId\", String(bc.id)); }",
                   "if (bc && bc.id) { pm.collectionVariables.set(\"reportIdVuaTao\", String(bc.id)); }"
                 ]
               }
@@ -2941,7 +2757,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "{{reportIdVuaTao}}",
+                  "value": "{{reportId}}",
                   "description": "ID báo cáo"
                 }
               ]
@@ -3274,12 +3090,7 @@
                   "// Slug thật do hệ thống sinh khi đồng bộ GitHub (ví dụ \"octocat-d8f549\"), không",
                   "// trùng với giá trị phỏng đoán trong environment. Lấy thẳng từ trang quản lý.",
                   "const slug = pm.response.text().match(/\\/p\\/([A-Za-z0-9._-]+)/);",
-                  "if (slug) { pm.collectionVariables.set(\"portfolioSlug\", slug[1]); }",
-                  "",
-                  "// Slug thật do hệ thống sinh khi đồng bộ GitHub (ví dụ \"octocat-d8f549\"), không",
-                  "// trùng với giá trị phỏng đoán trong environment. Lấy thẳng từ trang quản lý.",
-                  "const slug = pm.response.text().match(/\\/p\\/([A-Za-z0-9._-]+)/);",
-                  "if (slug) { pm.collectionVariables.set(\"portfolioSlug\", slug[1]); }"
+                  "if (slug) { pm.environment.set(\"portfolioSlug\", slug[1]); }"
                 ]
               }
             }
@@ -3337,6 +3148,16 @@
                   "});",
                   "pm.test(\"Thời gian phản hồi < 30000ms (gọi GitHub + LLM)\", function () {",
                   "    pm.expect(pm.response.responseTime).to.be.below(30000);",
+                  "});",
+                  "",
+                  "// Sau khi đồng bộ mới có portfolio; slug do hệ thống sinh kèm hậu tố ngẫu nhiên.",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.replaceIn(\"{{baseUrl}}/portfolio/manage\"),",
+                  "    method: \"GET\",",
+                  "}, function (err, res) {",
+                  "    if (err || !res) { return; }",
+                  "    const m = res.text().match(/\\/p\\/([A-Za-z0-9._-]+)/);",
+                  "    if (m) { pm.collectionVariables.set(\"portfolioSlug\", m[1]); }",
                   "});"
                 ]
               }
@@ -3460,6 +3281,38 @@
           "protocolProfileBehavior": {
             "followRedirects": false
           }
+        },
+        {
+          "name": "TC-PF-04b · GET /portfolio/manage — Lấy slug thật trước khi mở trang công khai",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portfolio/manage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portfolio",
+                "manage"
+              ]
+            },
+            "description": "TC-PF-01 chạy TRƯỚC khi đồng bộ nên lúc đó chưa có portfolio. Hệ thống sinh slug kèm hậu tố ngẫu nhiên (ví dụ phatdayne2005-d553bf), không trùng giá trị phỏng đoán trong environment."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const m = pm.response.text().match(/\\/p\\/([A-Za-z0-9._-]+)/);",
+                  "if (m) { pm.environment.set(\"portfolioSlug\", m[1]); }"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "TC-PF-05 · GET /p/:slug — Trang E-Portfolio CÔNG KHAI (không cần đăng nhập)",
@@ -3599,7 +3452,7 @@
           ]
         },
         {
-          "name": "TC-PR-00 · GET /login — Làm mới CSRF token trước khi đăng nhập",
+          "name": "TC-PR-00a · GET /login — Làm mới CSRF token trước khi đăng nhập",
           "request": {
             "method": "GET",
             "header": [],
@@ -3624,6 +3477,63 @@
                   "pm.test(\"200 OK — đã lấy được CSRF token mới\", function () {",
                   "    pm.response.to.have.status(200);",
                   "    pm.expect(pm.collectionVariables.get(\"csrfToken\")).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-PR-00b · POST /login — Đăng nhập lại STUDENT cho thư mục hồ sơ",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{studentEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{studentPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "_csrf",
+                  "value": "{{csrfToken}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "TC-PF-05 xoá cookie để kiểm chứng trang công khai, làm mất phiên STUDENT."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Đăng nhập thành công → 302 về /\", function () {",
+                  "    pm.response.to.have.status(302);",
+                  "    // Đăng nhập ĐÚNG chuyển về \"/\", sai mật khẩu chuyển về \"/login?error\",",
+                  "    // còn CSRF bị từ chối thì chuyển về \"/login\" không kèm tham số.",
+                  "    pm.expect(pm.response.headers.get(\"Location\")).to.not.include(\"/login\");",
                   "});"
                 ]
               }
@@ -3992,7 +3902,7 @@
               "urlencoded": [
                 {
                   "key": "email",
-                  "value": "new.email.{{$randomInt}}@gmail.com",
+                  "value": "{{emailDaDoi}}",
                   "type": "text",
                   "description": "Email mới, phải duy nhất"
                 },
@@ -4024,63 +3934,7 @@
           }
         },
         {
-          "name": "TC-PR-07b · POST /profile/email — Trả lại email gốc (dọn dẹp)",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "email",
-                  "value": "{{studentEmail}}",
-                  "type": "text"
-                },
-                {
-                  "key": "_csrf",
-                  "value": "{{csrfToken}}",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{baseUrl}}/profile/email",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "profile",
-                "email"
-              ]
-            },
-            "description": "TC-PR-07 đổi email đăng nhập sang một địa chỉ ngẫu nhiên và không trả lại, khiến tài khoản kiểm thử mất định danh và mọi lượt chạy sau đăng nhập vào một tài khoản khác. Bước này trả email về giá trị trong environment để bộ kiểm thử chạy được nhiều lần mà kết quả không đổi."
-          },
-          "protocolProfileBehavior": {
-            "followRedirects": false
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Đã trả email về giá trị gốc\", function () {",
-                  "    pm.expect(pm.response.code, \"mã trạng thái\").to.be.oneOf([200, 302]);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "09 · Admin",
-      "description": "Quản trị người dùng & phân quyền. **Yêu cầu đăng nhập ADMIN (TC-AUTH-16).**",
-      "item": [
-        {
-          "name": "TC-AD-00a · GET /login — Làm mới CSRF token trước khi đăng nhập",
+          "name": "TC-PR-07a · GET /login — Làm mới CSRF token trước khi đăng nhập",
           "request": {
             "method": "GET",
             "header": [],
@@ -4111,6 +3965,148 @@
             }
           ]
         },
+        {
+          "name": "TC-PR-07b · POST /login — Đăng nhập bằng email vừa đổi",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{emailDaDoi}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{studentPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "_csrf",
+                  "value": "{{csrfToken}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Đổi email đăng nhập làm phiên hiện tại mất hiệu lực."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Đăng nhập thành công → 302 về /\", function () {",
+                  "    pm.response.to.have.status(302);",
+                  "    // Đăng nhập ĐÚNG chuyển về \"/\", sai mật khẩu chuyển về \"/login?error\",",
+                  "    // còn CSRF bị từ chối thì chuyển về \"/login\" không kèm tham số.",
+                  "    pm.expect(pm.response.headers.get(\"Location\")).to.not.include(\"/login\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-PR-07b2 · GET /profile — Làm mới CSRF token sau khi đăng nhập lại",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            },
+            "description": "Đăng nhập thành công xoay CSRF token; phải lấy token mới trước khi gửi form trả lại email."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK — đã đăng nhập lại được\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-PR-07c · POST /profile/email — Trả lại email gốc (dọn dẹp)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "{{studentEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "_csrf",
+                  "value": "{{csrfToken}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/email",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile",
+                "email"
+              ]
+            },
+            "description": "Không có bước này thì tài khoản kiểm thử mất định danh vĩnh viễn: student@gmail.com bị bỏ trống, một tài khoản đăng ký mới chiếm chỗ, và mọi lượt chạy sau đăng nhập vào một tài khoản rỗng."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Đã trả email về giá trị gốc\", function () {",
+                  "    pm.expect(pm.response.code, \"mã trạng thái\").to.be.oneOf([200, 302]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09 · Admin",
+      "description": "Quản trị người dùng & phân quyền. **Yêu cầu đăng nhập ADMIN (TC-AUTH-16).**",
+      "item": [
         {
           "name": "TC-AD-00a · GET /login — Làm mới CSRF token trước khi đăng nhập",
           "request": {
@@ -4261,27 +4257,19 @@
                 "exec": [
                   "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
                   "",
-                  "// targetUserId trước đây cứng bằng 2 — id đó không tồn tại trong CSDL nên",
-                  "// TC-AD-04/05/07 ném IllegalArgumentException và trả 500. Trích id thật từ",
-                  "// chính bảng danh sách, bỏ qua tài khoản admin đang đăng nhập để tránh lỗi",
-                  "// \"không thể tự khoá tài khoản của chính mình\".",
-                  "const ids = [...pm.response.text().matchAll(/\\/admin\\/users\\/(\\d+)\\/toggle-status/g)]",
-                  "    .map(m => m[1]);",
-                  "pm.test(\"Tìm được ít nhất một người dùng để thao tác\", function () {",
-                  "    pm.expect(ids.length, \"số user trong danh sách\").to.be.above(0);",
+                  "// Chon tai khoan dung-mot-lan (email bat dau bang \"test.\") do TC-AUTH-07 tao.",
+                  "// TUYET DOI khong chon admin/student/counselor: cac thu muc sau con dung chung.",
+                  "const hang = pm.response.text().split(/<tr[\\s>]/i);",
+                  "let id = null;",
+                  "hang.forEach(function (h) {",
+                  "    if (h.indexOf(\"test.\") === -1) { return; }",
+                  "    const m = h.match(/\\/admin\\/users\\/(\\d+)\\/toggle-status/);",
+                  "    if (m) { id = m[1]; }",
                   "});",
-                  "if (ids.length) { pm.collectionVariables.set(\"targetUserId\", ids[ids.length - 1]); }",
-                  "",
-                  "// targetUserId trước đây cứng bằng 2 — id đó không tồn tại trong CSDL nên",
-                  "// TC-AD-04/05/07 ném IllegalArgumentException và trả 500. Trích id thật từ",
-                  "// chính bảng danh sách, bỏ qua tài khoản admin đang đăng nhập để tránh lỗi",
-                  "// \"không thể tự khoá tài khoản của chính mình\".",
-                  "const ids = [...pm.response.text().matchAll(/\\/admin\\/users\\/(\\d+)\\/toggle-status/g)]",
-                  "    .map(m => m[1]);",
-                  "pm.test(\"Tìm được ít nhất một người dùng để thao tác\", function () {",
-                  "    pm.expect(ids.length, \"số user trong danh sách\").to.be.above(0);",
+                  "pm.test(\"Tìm được tài khoản dùng-một-lần để thao tác\", function () {",
+                  "    pm.expect(id, \"id tài khoản test.*\").to.not.be.null;",
                   "});",
-                  "if (ids.length) { pm.collectionVariables.set(\"targetUserId\", ids[ids.length - 1]); }"
+                  "if (id) { pm.collectionVariables.set(\"targetUserId\", id); }"
                 ]
               }
             }
@@ -4616,38 +4604,6 @@
           ]
         },
         {
-          "name": "TC-CS-00a · GET /login — Làm mới CSRF token trước khi đăng nhập",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "login"
-              ]
-            },
-            "description": "Bước bắt buộc trước mọi POST /login. Spring Security xoay CSRF token mỗi khi phiên thay đổi (đăng xuất, đăng nhập). Script cấp collection chỉ trích token từ phản hồi HTML, mà 302 của /logout và /login không có body, nên nếu không có bước này thì lần đăng nhập kế tiếp dùng token cũ và bị từ chối."
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"200 OK — đã lấy được CSRF token mới\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    pm.expect(pm.collectionVariables.get(\"csrfToken\")).to.be.a(\"string\").and.not.empty;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
           "name": "TC-CS-00 · POST /login — Đăng nhập COUNSELOR cho thư mục Counselor",
           "request": {
             "method": "POST",
@@ -4735,15 +4691,6 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
-                  "",
-                  "// templateId trước đây cứng bằng 1, nhưng chính TC-CS-11 xoá template đó ở",
-                  "// lần chạy trước nên id trôi dần. Lấy template cuối cùng đang có thật.",
-                  "const tids = [...pm.response.text().matchAll(/\\/counselor\\/templates\\/(\\d+)\\/editor/g)]",
-                  "    .map(m => m[1]);",
-                  "pm.test(\"Tìm được ít nhất một template\", function () {",
-                  "    pm.expect(tids.length, \"số template\").to.be.above(0);",
-                  "});",
-                  "if (tids.length) { pm.collectionVariables.set(\"templateId\", tids[tids.length - 1]); }",
                   "",
                   "// templateId trước đây cứng bằng 1, nhưng chính TC-CS-11 xoá template đó ở",
                   "// lần chạy trước nên id trôi dần. Lấy template cuối cùng đang có thật.",
@@ -4943,12 +4890,6 @@
                   "// node có thật thay vì skillNodeId = 1 cứng.",
                   "const nids = [...pm.response.text().matchAll(/\\/counselor\\/nodes\\/(\\d+)\\/details/g)]",
                   "    .map(m => m[1]);",
-                  "if (nids.length) { pm.collectionVariables.set(\"skillNodeId\", nids[nids.length - 1]); }",
-                  "",
-                  "// Lấy node cuối cùng trong trình soạn để TC-CS-06 → TC-CS-10 thao tác trên",
-                  "// node có thật thay vì skillNodeId = 1 cứng.",
-                  "const nids = [...pm.response.text().matchAll(/\\/counselor\\/nodes\\/(\\d+)\\/details/g)]",
-                  "    .map(m => m[1]);",
                   "if (nids.length) { pm.collectionVariables.set(\"skillNodeId\", nids[nids.length - 1]); }"
                 ]
               }
@@ -5043,11 +4984,6 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"200 OK trả về fragment cây node\", () => pm.response.to.have.status(200));",
-                  "",
-                  "// Node vừa tạo có id lớn nhất — dùng cho TC-CS-10 xoá đúng node này.",
-                  "const nids = [...pm.response.text().matchAll(/\\/counselor\\/nodes\\/(\\d+)\\/details/g)]",
-                  "    .map(m => Number(m[1]));",
-                  "if (nids.length) { pm.collectionVariables.set(\"skillNodeId\", String(Math.max(...nids))); }",
                   "",
                   "// Node vừa tạo có id lớn nhất — dùng cho TC-CS-10 xoá đúng node này.",
                   "const nids = [...pm.response.text().matchAll(/\\/counselor\\/nodes\\/(\\d+)\\/details/g)]",
@@ -5620,95 +5556,6 @@
           ]
         },
         {
-          "name": "TC-SEC-00a · GET /login — Làm mới CSRF token trước khi đăng nhập",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "login"
-              ]
-            },
-            "description": "Bước bắt buộc trước mọi POST /login. Spring Security xoay CSRF token mỗi khi phiên thay đổi (đăng xuất, đăng nhập). Script cấp collection chỉ trích token từ phản hồi HTML, mà 302 của /logout và /login không có body, nên nếu không có bước này thì lần đăng nhập kế tiếp dùng token cũ và bị từ chối."
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"200 OK — đã lấy được CSRF token mới\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    pm.expect(pm.collectionVariables.get(\"csrfToken\")).to.be.a(\"string\").and.not.empty;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "TC-SEC-00b · POST /login — Đăng nhập lại STUDENT cho thư mục bảo mật",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "username",
-                  "value": "{{studentEmail}}",
-                  "type": "text"
-                },
-                {
-                  "key": "password",
-                  "value": "{{studentPassword}}",
-                  "type": "text"
-                },
-                {
-                  "key": "_csrf",
-                  "value": "{{csrfToken}}",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{baseUrl}}/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "login"
-              ]
-            },
-            "description": "Thư mục 11 kiểm chứng phân quyền của STUDENT. Nhưng TC-CS-00 ở thư mục 10 vừa đăng nhập COUNSELOR, nên nếu không đăng nhập lại thì TC-SEC-03 và TC-SEC-04 đang kiểm quyền của COUNSELOR chứ không phải STUDENT."
-          },
-          "protocolProfileBehavior": {
-            "followRedirects": false
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Đăng nhập thành công → 302 về /\", function () {",
-                  "    pm.response.to.have.status(302);",
-                  "    // Đăng nhập ĐÚNG chuyển về \"/\", sai mật khẩu chuyển về \"/login?error\",",
-                  "    // còn CSRF bị từ chối thì chuyển về \"/login\" không kèm tham số.",
-                  "    pm.expect(pm.response.headers.get(\"Location\")).to.not.include(\"/login\");",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
           "name": "TC-SEC-03 · GET /admin/users — STUDENT truy cập khu vực ADMIN",
           "request": {
             "method": "GET",
@@ -5869,51 +5716,6 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"200 OK\", () => pm.response.to.have.status(200));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "TC-SEC-06b · GET /login — Làm mới CSRF token trước khi đăng nhập",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "login"
-              ]
-            },
-            "description": "Bước bắt buộc trước mọi POST /login. Spring Security xoay CSRF token mỗi khi phiên thay đổi (đăng xuất, đăng nhập). Script cấp collection chỉ trích token từ phản hồi HTML, mà 302 của /logout và /login không có body, nên nếu không có bước này thì lần đăng nhập kế tiếp dùng token cũ và bị từ chối."
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "// Xoá cookie JSESSIONID để mô phỏng người dùng CHƯA đăng nhập. Phải xoá NGAY TRƯỚC",
-                  "// khi lấy CSRF token, vì token gắn với phiên: lấy token ở phiên cũ rồi mới xoá cookie",
-                  "// thì token đó vô nghĩa với phiên mới và Spring Security trả 403.",
-                  "const jar = pm.cookies.jar();",
-                  "jar.clear(pm.environment.get(\"baseUrl\") || pm.collectionVariables.get(\"baseUrl\"), function () {});"
-                ]
-              }
-            },
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"200 OK — đã lấy được CSRF token mới\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    pm.expect(pm.collectionVariables.get(\"csrfToken\")).to.be.a(\"string\").and.not.empty;",
-                  "});"
                 ]
               }
             }
@@ -6223,6 +6025,11 @@
       "value": "",
       "type": "string",
       "description": "Token đặt lại mật khẩu lấy từ email"
+    },
+    {
+      "key": "emailDaDoi",
+      "value": "student.doi.email@gmail.com",
+      "type": "string"
     }
   ]
 }
