@@ -29,6 +29,16 @@ import pathlib
 FILE = pathlib.Path("CareerCompass.postman_collection.json")
 d = json.loads(FILE.read_text(encoding="utf-8"))
 
+# Script này vá BẢN GỐC. Chạy chồng lên bản đã vá sẽ nhân đôi các request chèn thêm
+# và làm sai thứ tự (đã gặp: hai request cùng tên TC-PR-07b, cái dọn dẹp chạy trước
+# cái đăng nhập nên bị 403 và email không được trả về).
+if "TC-PR-07c" in FILE.read_text(encoding="utf-8"):
+    raise SystemExit(
+        "Collection DA duoc va roi. Lay lai ban goc truoc khi chay lai:"
+        + chr(10)
+        + "    git show 66afb85:CareerCompass.postman_collection.json"
+        + " > CareerCompass.postman_collection.json")
+
 
 def duyet(items, cha=None):
     for it in items:
@@ -526,43 +536,195 @@ FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 # =====================================================================
-# 12. TC-PR-07 phá hỏng tài khoản kiểm thử cho MỌI lượt chạy sau
+# 13. Thu muc Admin dang thao tac tren chinh tai khoan student dung chung
 # =====================================================================
-# Nó đổi email đăng nhập của student thành new.email.<ngẫu nhiên>@gmail.com và
-# KHÔNG trả lại. Hậu quả dây chuyền quan sát được trong CSDL:
-#   - Tài khoản student thật (id 7) mang email new.email.490@gmail.com
-#   - Địa chỉ student@gmail.com bị bỏ trống, một tài khoản đăng ký mới chiếm chỗ
-#   - Tài khoản mới đó không có onboarding, roadmap, portfolio, báo cáo nào
-#   - Lượt chạy kế tiếp đăng nhập vào đúng tài khoản rỗng đó -> hàng loạt 404 ở
-#     TC-RM-09, TC-SG-07/08/09, TC-PF-05, TC-SEC-06
-# Đây là lý do kết quả chạy Postman đổi khác nhau giữa các lần mà không ai sửa gì.
-pr = tim_thu_muc("08 ·")
-tra_lai = {
-    "name": "TC-PR-07b · POST /profile/email — Trả lại email gốc (dọn dẹp)",
-    "request": {
-        "method": "POST",
-        "header": [],
-        "body": {"mode": "urlencoded", "urlencoded": [
-            {"key": "email", "value": "{{studentEmail}}", "type": "text"},
-            {"key": "_csrf", "value": "{{csrfToken}}", "type": "text"},
-        ]},
-        "url": {"raw": "{{baseUrl}}/profile/email", "host": ["{{baseUrl}}"],
-                "path": ["profile", "email"]},
-        "description": (
-            "TC-PR-07 đổi email đăng nhập sang một địa chỉ ngẫu nhiên và không trả lại, "
-            "khiến tài khoản kiểm thử mất định danh và mọi lượt chạy sau đăng nhập vào "
-            "một tài khoản khác. Bước này trả email về giá trị trong environment để bộ "
-            "kiểm thử chạy được nhiều lần mà kết quả không đổi."),
-    },
-    "protocolProfileBehavior": {"followRedirects": False},
+# Quan sat tren CSDL vua gieo lai: TC-AD-04/05/07 deu goi /admin/users/2/...
+# ma id 2 chinh la student@gmail.com. Ket qua: tai khoan bi khoa, bi doi vai tro
+# tu STUDENT sang COUNSELOR, roi bi xoa. Moi thu muc chay sau do deu sai:
+# dang nhap tra /login?error, va TC-SEC-03/04 kiem quyen cua nham vai tro.
+#
+# Sua: chi thao tac tren tai khoan dung-mot-lan do TC-AUTH-07 tao (email dang
+# test.<so>@gmail.com), khong bao gio dung vao ba tai khoan he thong.
+dat_script(tim("TC-AD-02"), "test", [
+    'pm.test("200 OK", () => pm.response.to.have.status(200));',
+    '',
+    '// Chon tai khoan dung-mot-lan (email bat dau bang "test.") do TC-AUTH-07 tao.',
+    '// TUYET DOI khong chon admin/student/counselor: cac thu muc sau con dung chung.',
+    'const hang = pm.response.text().split(/<tr[\s>]/i);',
+    'let id = null;',
+    'hang.forEach(function (h) {',
+    '    if (h.indexOf("test.") === -1) { return; }',
+    '    const m = h.match(/\/admin\/users\/(\d+)\/toggle-status/);',
+    '    if (m) { id = m[1]; }',
+    '});',
+    'pm.test("Tìm được tài khoản dùng-một-lần để thao tác", function () {',
+    '    pm.expect(id, "id tài khoản test.*").to.not.be.null;',
+    '});',
+    'if (id) { pm.collectionVariables.set("targetUserId", id); }',
+])
+print("  [13] thu muc Admin chi thao tac tren tai khoan test.* dung mot lan")
+
+FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+# =====================================================================
+# 14. Hai diem cuoi
+# =====================================================================
+# (a) Bien reportIdVuaTao do minh tao khong duoc phan giai khi thay the {{...}}
+#     — URL cua TC-SG-05 ra %7B%7BreportIdVuaTao%7D%7D. Dung lai bien reportId
+#     ma script goc cua TC-SG-03 da dat, bien nay hoat dong binh thuong.
+for v in tim("TC-SG-05")["request"]["url"].get("variable", []):
+    if v["key"] == "id":
+        v["value"] = "{{reportId}}"
+
+# (b) TC-PF-01 trich slug TRUOC khi dong bo nen luc do chua co portfolio. Trich
+#     lai sau TC-PF-02. Do thuc te: dong bo mat 69 giay va sinh slug dang
+#     "phatdayne2005-d553bf", khong trung gia tri phong doan trong environment.
+them_vao_script(tim("TC-PF-02"), "test", [
+    '',
+    '// Sau khi đồng bộ mới có portfolio; slug do hệ thống sinh kèm hậu tố ngẫu nhiên.',
+    'pm.sendRequest({',
+    '    url: pm.variables.replaceIn("{{baseUrl}}/portfolio/manage"),',
+    '    method: "GET",',
+    '}, function (err, res) {',
+    '    if (err || !res) { return; }',
+    '    const m = res.text().match(/\/p\/([A-Za-z0-9._-]+)/);',
+    '    if (m) { pm.collectionVariables.set("portfolioSlug", m[1]); }',
+    '});',
+])
+print("  [14] TC-SG-05 dung lai bien reportId; TC-PF-02 trich slug sau dong bo")
+
+FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+# =====================================================================
+# 15. Slug portfolio va phien bi mat o thu muc 08
+# =====================================================================
+# (a) Trich slug bang MOT REQUEST THAT thay vi pm.sendRequest trong test script:
+#     sendRequest chay bat dong bo nen bien duoc dat sau khi TC-PF-05 da gui di.
+#     Dat NGAY TRUOC TC-PF-05 vi TC-PF-03 dong bo bang username khong ton tai,
+#     co the lam doi hoac xoa portfolio vua tao.
+pf = tim_thu_muc("07 ·")
+lay_slug = {
+    "name": "TC-PF-04b · GET /portfolio/manage — Lấy slug thật trước khi mở trang công khai",
+    "request": {"method": "GET", "header": [],
+                "url": {"raw": "{{baseUrl}}/portfolio/manage", "host": ["{{baseUrl}}"],
+                        "path": ["portfolio", "manage"]},
+                "description": (
+                    "TC-PF-01 chạy TRƯỚC khi đồng bộ nên lúc đó chưa có portfolio. Hệ thống "
+                    "sinh slug kèm hậu tố ngẫu nhiên (ví dụ phatdayne2005-d553bf), không "
+                    "trùng giá trị phỏng đoán trong environment.")},
     "response": [],
     "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
-        'pm.test("Đã trả email về giá trị gốc", function () {',
-        '    pm.expect(pm.response.code, "mã trạng thái").to.be.oneOf([200, 302]);',
-        '});',
+        'pm.test("200 OK", () => pm.response.to.have.status(200));',
+        'const m = pm.response.text().match(/\/p\/([A-Za-z0-9._-]+)/);',
+        'if (m) { pm.collectionVariables.set("portfolioSlug", m[1]); }',
     ]}}],
 }
-pr["item"].insert(vi_tri(pr, "TC-PR-07") + 1, tra_lai)
-print("  [12] them TC-PR-07b tra lai email goc cho tai khoan kiem thu")
+pf["item"].insert(vi_tri(pf, "TC-PF-05"), lay_slug)
+
+# (b) TC-PF-05 xoa cookie de kiem chung trang cong khai, giet luon phien STUDENT ma
+#     thu muc 08 can. Dang nhap lai o dau thu muc 08.
+# (c) TC-PR-07 doi email dang nhap -> phien mat hieu luc -> khong the tra email ve.
+#     Dat email moi la gia tri XAC DINH, dang nhap lai bang chinh no, roi tra ve.
+#     Neu khong tra ve, luot chay sau se dang nhap that bai vi tai khoan da doi ten.
+pr = tim_thu_muc("08 ·")
+for f in tim("TC-PR-07")["request"]["body"]["urlencoded"]:
+    if f["key"] == "email":
+        f["value"] = "{{emailDaDoi}}"
+d.setdefault("variable", []).append(
+    {"key": "emailDaDoi", "value": "student.doi.email@gmail.com", "type": "string"})
+
+vt = vi_tri(pr, "TC-PR-07") + 1
+for k, it in enumerate([
+    request_lam_moi_csrf("TC-PR-07a"),
+    request_dang_nhap("TC-PR-07b", "Đăng nhập bằng email vừa đổi", "emailDaDoi",
+                      "studentPassword",
+                      "Đổi email đăng nhập làm phiên hiện tại mất hiệu lực."),
+    {
+        "name": "TC-PR-07c · POST /profile/email — Trả lại email gốc (dọn dẹp)",
+        "request": {"method": "POST", "header": [],
+                    "body": {"mode": "urlencoded", "urlencoded": [
+                        {"key": "email", "value": "{{studentEmail}}", "type": "text"},
+                        {"key": "_csrf", "value": "{{csrfToken}}", "type": "text"}]},
+                    "url": {"raw": "{{baseUrl}}/profile/email", "host": ["{{baseUrl}}"],
+                            "path": ["profile", "email"]},
+                    "description": (
+                        "Không có bước này thì tài khoản kiểm thử mất định danh vĩnh viễn: "
+                        "student@gmail.com bị bỏ trống, một tài khoản đăng ký mới chiếm chỗ, "
+                        "và mọi lượt chạy sau đăng nhập vào một tài khoản rỗng.")},
+        "protocolProfileBehavior": {"followRedirects": False},
+        "response": [],
+        "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+            'pm.test("Đã trả email về giá trị gốc", function () {',
+            '    pm.expect(pm.response.code, "mã trạng thái").to.be.oneOf([200, 302]);',
+            '});']}}],
+    },
+], 0):
+    pr["item"].insert(vt + k, it)
+
+pr["item"].insert(1, request_lam_moi_csrf("TC-PR-00a"))
+pr["item"].insert(2, request_dang_nhap(
+    "TC-PR-00b", "Đăng nhập lại STUDENT cho thư mục hồ sơ", "studentEmail", "studentPassword",
+    "TC-PF-05 xoá cookie để kiểm chứng trang công khai, làm mất phiên STUDENT."))
+print("  [15] TC-PF-04b lay slug; thu muc 08 dang nhap lai; TC-PR-07 doi-roi-tra email")
+
+FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+# =====================================================================
+# 16. Lam moi CSRF sau khi dang nhap lai bang email moi
+# =====================================================================
+# Dang nhap thanh cong xoay CSRF token. TC-PR-07c dung token lay tu truoc khi
+# dang nhap nen bi 403 va email khong duoc tra ve.
+pr = tim_thu_muc("08 ·")
+pr["item"].insert(vi_tri(pr, "TC-PR-07c"), {
+    "name": "TC-PR-07b2 · GET /profile — Làm mới CSRF token sau khi đăng nhập lại",
+    "request": {"method": "GET", "header": [],
+                "url": {"raw": "{{baseUrl}}/profile", "host": ["{{baseUrl}}"],
+                        "path": ["profile"]},
+                "description": "Đăng nhập thành công xoay CSRF token; phải lấy token mới "
+                               "trước khi gửi form trả lại email."},
+    "response": [],
+    "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+        'pm.test("200 OK — đã đăng nhập lại được", () => pm.response.to.have.status(200));',
+    ]}}],
+})
+print("  [16] them TC-PR-07b2 lam moi CSRF truoc khi tra lai email")
+
+FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+# =====================================================================
+# 17. portfolioSlug phai ghi vao pham vi ENVIRONMENT
+# =====================================================================
+# portfolioSlug CO trong file environment, ma environment duoc uu tien cao hon
+# collection. Vi vay pm.collectionVariables.set khong he co tac dung: {{portfolioSlug}}
+# van lay gia tri phong doan "phatdayne2005" trong khi slug that la
+# "phatdayne2005-7760a5" (he thong sinh kem hau to ngau nhien) -> TC-PF-05 va
+# TC-SEC-06 luon 404.
+#
+# Luu y nguoc lai: KHONG dung pm.environment.set cho skillNodeId, vi bien do khong
+# co trong environment va viec ghi vao day lam no song suot luot chay, ro sang thu
+# muc Counselor lam TC-CS-06 goi nham id. Da thu va da bo.
+def tim_song(ma):
+    """Tìm trong cây HIỆN TẠI, kể cả request vừa chèn thêm — khác tim() vốn dùng
+    bảng tên dựng từ đầu script nên không thấy các mục mới."""
+    for it, _ in duyet(d["item"]):
+        if ma in it["name"]:
+            return it
+    raise SystemExit(f"khong tim thay {ma}")
+
+
+for ma in ("TC-PF-01 ", "TC-PF-04b"):
+    it = tim_song(ma)
+    for ev in it.get("event", []):
+        if ev["listen"] == "test":
+            ev["script"]["exec"] = [
+                l.replace('pm.collectionVariables.set("portfolioSlug"',
+                          'pm.environment.set("portfolioSlug"')
+                for l in ev["script"]["exec"]
+            ]
+print("  [17] portfolioSlug ghi vao environment thay vi collection")
 
 FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
