@@ -4731,7 +4731,7 @@
               "urlencoded": [
                 {
                   "key": "name",
-                  "value": "Backend Developer Roadmap (test)",
+                  "value": "Lộ trình QA Engineer (test)",
                   "type": "text",
                   "description": "Tên template"
                 },
@@ -4743,7 +4743,7 @@
                 },
                 {
                   "key": "careerRoleName",
-                  "value": "Backend Developer",
+                  "value": "QA Engineer (test)",
                   "type": "text",
                   "description": "Tên CareerRole đã tồn tại"
                 },
@@ -4766,6 +4766,14 @@
                   "pm.test(\"302 quay lại danh sách template\", function () {",
                   "    pm.response.to.have.status(302);",
                   "    pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/counselor/templates\");",
+                  "});",
+                  "",
+                  "// Trước đây gửi careerRoleName = \"Backend Developer\" — vai trò đã có lộ trình mẫu",
+                  "// nên service ném lỗi, controller bắt lại rồi vẫn redirect 302. Assertion chỉ kiểm",
+                  "// 302 nên PASS trong khi không có gì được tạo. Nay dùng vai trò mới để tạo thật.",
+                  "pm.test(\"Không bị từ chối vì vai trò đã có lộ trình mẫu\", function () {",
+                  "    const loc = pm.response.headers.get(\"Location\") || \"\";",
+                  "    pm.expect(loc).to.include(\"/counselor/templates\");",
                   "});"
                 ]
               }
@@ -4774,6 +4782,47 @@
           "protocolProfileBehavior": {
             "followRedirects": false
           }
+        },
+        {
+          "name": "TC-CS-02b · GET /counselor/templates — Bắt id template vừa tạo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/counselor/templates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "counselor",
+                "templates"
+              ]
+            },
+            "description": "Bắt id của template do TC-CS-02 vừa tạo, để TC-CS-03 và TC-CS-11 thao tác trên nó thay vì trên template gieo sẵn."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "",
+                  "// Template vừa tạo mang id lớn nhất. Bắt theo id thay vì dò tên trong HTML,",
+                  "// vì trang này dựng bằng thẻ card chứ không phải bảng <tr>.",
+                  "const ids = [...pm.response.text().matchAll(/\\/counselor\\/templates\\/(\\d+)/g)]",
+                  "    .map(m => Number(m[1]));",
+                  "pm.test(\"Template vừa tạo đã xuất hiện trong danh sách\", function () {",
+                  "    pm.expect(ids.length, \"số template\").to.be.above(0);",
+                  "    pm.expect(Math.max(...ids), \"id template mới\")",
+                  "        .to.be.above(Number(pm.collectionVariables.get(\"templateId\")) - 1);",
+                  "});",
+                  "if (ids.length) { pm.collectionVariables.set(\"templateIdRac\", String(Math.max(...ids))); }"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "TC-CS-03 · POST /counselor/templates/:id/update — Cập nhật template",
@@ -4799,7 +4848,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "{{templateId}}",
+                  "value": "{{templateIdRac}}",
                   "description": ""
                 }
               ]
@@ -5329,12 +5378,12 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "{{templateId}}",
+                  "value": "{{templateIdRac}}",
                   "description": ""
                 }
               ]
             },
-            "description": "**TC-CS-11**\n\n⚠️ Thao tác phá huỷ dữ liệu — template đang được sinh viên sử dụng thì không nên xoá.",
+            "description": "Xoá template do chính TC-CS-02 tạo ra. Trước đây xoá {{templateId}} — tức template gieo sẵn mà TC-CS-01 chọn — nên mỗi lượt chạy làm mất một template của hệ thống.",
             "body": {
               "mode": "urlencoded",
               "urlencoded": [

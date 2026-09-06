@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,6 +122,12 @@ public class PortfolioService {
         projectRepositoryRepository.deleteByGithubProfileId(profile.getId());
 
         List<Map<String, Object>> response = fetchRepos(username);
+
+        // Lấy README và nhờ LLM tóm tắt cho TẤT CẢ repo cùng lúc, TRƯỚC khi ghi CSDL.
+        // Phần này thuần chờ mạng nên chạy song song rút ngắn rất nhiều; còn việc ghi
+        // vẫn tuần tự trên luồng gọi vì EntityManager của JPA không an toàn đa luồng.
+        Map<String, String> tomTat = tomTatSongSong(username, response);
+
         java.util.List<ProjectRepository> saved = new java.util.ArrayList<>();
         for (Map<String, Object> repoData : response) {
             String repoName = (String) repoData.get("name");
@@ -127,8 +136,7 @@ public class PortfolioService {
             Object starsRaw = repoData.get("stargazers_count");
             int stars = (starsRaw instanceof Number number) ? number.intValue() : 0;
 
-            String readme = fetchReadmeContent(username, repoName);
-            String aiSummary = generateAiSummary(repoName, readme, description);
+            String aiSummary = tomTat.get(repoName);
 
             saved.add(projectRepositoryRepository.save(ProjectRepository.builder()
                     .repoName(repoName)
@@ -141,6 +149,59 @@ public class PortfolioService {
                     .build()));
         }
         return saved;
+    }
+
+    /**
+     * Số luồng chạy song song khi lấy README và gọi LLM.
+     *
+     * <p>Chọn 6 chứ không phải càng nhiều càng tốt: Gemini bản miễn phí giới hạn tần suất,
+     * đẩy quá nhiều yêu cầu cùng lúc sẽ nhận 429 rồi rơi vào nhánh thử lại của
+     * {@link LlmClient}, hoá ra còn chậm hơn. Sáu luồng đủ để một tài khoản 30 repo —
+     * mức trần mà NFR-P03 nêu — chạy hết trong 5 đợt.
+     */
+    private static final int SO_LUONG_SONG_SONG = 6;
+
+    /**
+     * Lấy README rồi nhờ LLM tóm tắt cho mọi repo cùng lúc, trả về map {@code tên repo → tóm tắt}.
+     *
+     * <p><b>Vì sao cần:</b> vòng lặp cũ làm tuần tự từng repo, mỗi repo tốn 2 lệnh HTTP lấy
+     * README cộng 1 lệnh gọi LLM. Đo thực tế với tài khoản 9 repo: 84 giây, tức khoảng 9 giây
+     * mỗi repo, vượt xa ngưỡng 30 giây của NFR-P03. Toàn bộ thời gian đó là ngồi chờ mạng chứ
+     * không phải tính toán, nên chạy song song cắt được gần hết.
+     *
+     * <p>Mỗi repo vẫn tự nuốt lỗi riêng trong {@link #generateAiSummary}, nên một repo hỏng
+     * không kéo đổ cả lần đồng bộ.
+     */
+    private Map<String, String> tomTatSongSong(String username, List<Map<String, Object>> repos) {
+        if (repos.isEmpty()) {
+            return Map.of();
+        }
+        ExecutorService pool = Executors.newFixedThreadPool(
+                Math.min(SO_LUONG_SONG_SONG, repos.size()),
+                r -> {
+                    Thread t = new Thread(r, "dong-bo-github");
+                    t.setDaemon(true);   // không giữ JVM sống nếu app tắt giữa chừng
+                    return t;
+                });
+        try {
+            List<CompletableFuture<Map.Entry<String, String>>> viec = repos.stream()
+                    .map(repoData -> CompletableFuture.supplyAsync(() -> {
+                        String repoName = (String) repoData.get("name");
+                        String readme = fetchReadmeContent(username, repoName);
+                        String description = (String) repoData.get("description");
+                        return Map.entry(repoName, generateAiSummary(repoName, readme, description));
+                    }, pool))
+                    .toList();
+
+            Map<String, String> ketQua = new java.util.HashMap<>();
+            for (CompletableFuture<Map.Entry<String, String>> f : viec) {
+                Map.Entry<String, String> e = f.join();
+                ketQua.put(e.getKey(), e.getValue());
+            }
+            return ketQua;
+        } finally {
+            pool.shutdown();
+        }
     }
 
     @SuppressWarnings("unchecked")

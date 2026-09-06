@@ -728,3 +728,73 @@ for ma in ("TC-PF-01 ", "TC-PF-04b"):
 print("  [17] portfolioSlug ghi vao environment thay vi collection")
 
 FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+# =====================================================================
+# 18. TC-CS-02 pass gia, va TC-CS-11 xoa nham template gieo san
+# =====================================================================
+# TC-CS-02 gui careerRoleName = "Backend Developer" — vai tro DA co lo trinh mau.
+# CounselorTemplateService.createTemplate nem "Vai tro nghe nghiep nay da co lo
+# trinh mau!", controller bat lai va redirect 302 kem flash error. Assertion cu chi
+# kiem 302 nen PASS, trong khi khong template nao duoc tao. Kiem chung: goi tay
+# POST /counselor/templates -> 302 nhung so template van la 6.
+#
+# Hau qua tiep theo: TC-CS-11 xoa {{templateId}} — template GIEO SAN ma TC-CS-01
+# chon — nen moi luot chay mat mot template he thong. Sau sau luot la CSDL het
+# template, keo theo /dashboard, /roadmap, /skill-gap deu 404.
+cs = tim_thu_muc("10 ·")
+
+# (a) Tao voi mot vai tro nghe nghiep CHUA ton tai. resolveOrCreateCareerRole se
+#     tu tao vai tro do, nho vay lan nay template that su duoc tao.
+for f in tim("TC-CS-02")["request"]["body"]["urlencoded"]:
+    if f["key"] == "careerRoleName":
+        f["value"] = "QA Engineer (test)"
+    elif f["key"] == "name":
+        f["value"] = "Lộ trình QA Engineer (test)"
+them_vao_script(tim("TC-CS-02"), "test", [
+    '',
+    '// Trước đây gửi careerRoleName = "Backend Developer" — vai trò đã có lộ trình mẫu',
+    '// nên service ném lỗi, controller bắt lại rồi vẫn redirect 302. Assertion chỉ kiểm',
+    '// 302 nên PASS trong khi không có gì được tạo. Nay dùng vai trò mới để tạo thật.',
+    'pm.test("Không bị từ chối vì vai trò đã có lộ trình mẫu", function () {',
+    '    const loc = pm.response.headers.get("Location") || "";',
+    '    pm.expect(loc).to.include("/counselor/templates");',
+    '});',
+])
+
+# (b) Bat id template vua tao — no co id lon nhat vi vua duoc them.
+cs["item"].insert(vi_tri(cs, "TC-CS-03"), {
+    "name": "TC-CS-02b · GET /counselor/templates — Bắt id template vừa tạo",
+    "request": {"method": "GET", "header": [],
+                "url": {"raw": "{{baseUrl}}/counselor/templates", "host": ["{{baseUrl}}"],
+                        "path": ["counselor", "templates"]},
+                "description": "Bắt id của template do TC-CS-02 vừa tạo, để TC-CS-03 và "
+                               "TC-CS-11 thao tác trên nó thay vì trên template gieo sẵn."},
+    "response": [],
+    "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+        'pm.test("200 OK", () => pm.response.to.have.status(200));',
+        '',
+        '// Template vừa tạo mang id lớn nhất. Bắt theo id thay vì dò tên trong HTML,',
+        '// vì trang này dựng bằng thẻ card chứ không phải bảng <tr>.',
+        'const ids = [...pm.response.text().matchAll(/\/counselor\/templates\/(\d+)/g)]',
+        '    .map(m => Number(m[1]));',
+        'pm.test("Template vừa tạo đã xuất hiện trong danh sách", function () {',
+        '    pm.expect(ids.length, "số template").to.be.above(0);',
+        '    pm.expect(Math.max(...ids), "id template mới")',
+        '        .to.be.above(Number(pm.collectionVariables.get("templateId")) - 1);',
+        '});',
+        'if (ids.length) { pm.collectionVariables.set("templateIdRac", String(Math.max(...ids))); }',
+    ]}}],
+})
+
+# (c) TC-CS-03 (sua template) va TC-CS-11 (xoa) deu chi dung vao template vua tao.
+for ma in ("TC-CS-03", "TC-CS-11"):
+    for v in tim(ma)["request"]["url"].get("variable", []):
+        if v["key"] == "id":
+            v["value"] = "{{templateIdRac}}"
+tim("TC-CS-11")["request"]["description"] = (
+    "Xoá template do chính TC-CS-02 tạo ra. Trước đây xoá {{templateId}} — tức template "
+    "gieo sẵn mà TC-CS-01 chọn — nên mỗi lượt chạy làm mất một template của hệ thống.")
+print("  [18] TC-CS-02 tao vai tro moi; TC-CS-03 va TC-CS-11 chi dung vao template do")
+
+FILE.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
